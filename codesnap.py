@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 codesnap — Offline code extractor for Ubuntu Wayland (GNOME)
-Enhanced with multi-language OCR support and better code recognition
+Enhanced with aggressive character correction for code
 """
 
 import subprocess
@@ -39,98 +39,9 @@ except ImportError:
     pass
 
 # ─── version information ────────────────────────────────────────────────────
-__version__ = "2.2.1"
+__version__ = "2.2.2"
 __author__ = "codesnap"
-__description__ = "Offline code extractor for Ubuntu Wayland (GNOME) with multi-language OCR"
-
-# ─── Language configuration for OCR ─────────────────────────────────────────
-def get_installed_tesseract_langs():
-    """Get list of installed Tesseract languages"""
-    try:
-        result = subprocess.run(['tesseract', '--list-langs'], capture_output=True, text=True)
-        if result.returncode == 0:
-            return [l.strip() for l in result.stdout.split('\n')[1:] if l.strip()]
-    except:
-        pass
-    return []
-
-# ─── OCR character mapping for common mistakes ─────────────────────────────
-CHAR_MAP = {
-    # Numbers and letters confusion
-    '0': 'O', 'O': '0',
-    '1': 'I', 'I': '1',  # Fixed: '1' to 'I' is common
-    '5': 'S', 'S': '5',
-    '8': 'B', 'B': '8',
-    '2': 'Z', 'Z': '2',
-    '6': 'G', 'G': '6',
-    '9': 'g', 'g': '9',
-    
-    # Punctuation
-    ';': ':', ':': ';',
-    ',': '.', '.': ',',
-    "'": '"', '"': "'",
-    '`': "'", '´': "'",
-    '’': "'", '‘': "'",
-    '“': '"', '”': '"',
-    
-    # Code-specific
-    '(': '{', '{': '(',
-    ')': '}', '}': ')',
-    '<': '[', '[': '<',
-    '>': ']', ']': '>',
-    '|': 'I', 'I': '|',
-}
-
-# Common OCR misreadings of code keywords (expanded)
-KEYWORD_FIXES = {
-    # Python
-    r'\bdet\b': 'def',
-    r'\bdep\b': 'def',
-    r'\bclass\b': 'class',
-    r'\bimpart\b': 'import',
-    r'\bfromm\b': 'from',
-    r'\bretum\b': 'return',
-    r'\breturrn\b': 'return',
-    r'\bpriot\b': 'print',
-    r'\bprinr\b': 'print',
-    r'\bif\b': 'if',
-    r'\belse\b': 'else',
-    r'\belif\b': 'elif',
-    r'\bwhile\b': 'while',
-    r'\bfor\b': 'for',
-    r'\bin\b': 'in',
-    r'\bTrue\b': 'True',
-    r'\bFalse\b': 'False',
-    r'\bNone\b': 'None',
-    
-    # JavaScript/TypeScript
-    r'\bconsi\b': 'const',
-    r'\bcont\b': 'const',
-    r'\blet\b': 'let',
-    r'\bfuncrion\b': 'function',
-    r'\bexporr\b': 'export',
-    r'\bimporr\b': 'import',
-    r'\basync\b': 'async',
-    r'\bawait\b': 'await',
-    r'\btry\b': 'try',
-    r'\bcatch\b': 'catch',
-    
-    # Java/C++
-    r'\bpublic\b': 'public',
-    r'\bprivate\b': 'private',
-    r'\bprotecred\b': 'protected',
-    r'\bvoid\b': 'void',
-    r'\bint\b': 'int',
-    r'\bstring\b': 'String',
-    r'\bboolean\b': 'boolean',
-    r'\btrue\b': 'true',
-    r'\bfalse\b': 'false',
-    
-    # Common
-    r'\bnulll\b': 'null',
-    r'\bundefrned\b': 'undefined',
-    r'\bNaN\b': 'NaN',
-}
+__description__ = "Offline code extractor for Ubuntu Wayland (GNOME) with aggressive character correction"
 
 def print_logo():
     print("\n" + "="*60)
@@ -167,13 +78,7 @@ def show_version():
         status = "✓" if installed else "✗"
         print(f"    {status} {tool}")
     
-    # Check Tesseract languages
-    langs = get_installed_tesseract_langs()
-    if langs:
-        print(f"\n  Tesseract languages: {len(langs)} installed")
-        print(f"    {', '.join(langs[:10])}" + ("..." if len(langs) > 10 else ""))
-    
-    # Check Python packages - FIXED detection
+    # Check Python packages
     packages = {
         "Pillow": False,
         "numpy": False,
@@ -252,19 +157,18 @@ def preprocess_image(img_path: str, high_quality: bool = False) -> Image.Image:
             new_size = (int(width * scale_factor), int(height * scale_factor))
             img = img.resize(new_size, Image.Resampling.LANCZOS)
         
-        if high_quality:
-            # Apply multiple preprocessing steps
-            img = ImageEnhance.Contrast(img).enhance(2.5)
-            img = ImageEnhance.Sharpness(img).enhance(3.0)
-            
-            # Simple thresholding (more reliable)
-            img_array = np.array(img)
-            threshold = np.mean(img_array) * 0.8  # Adjusted threshold
-            binary = img_array > threshold
-            img = Image.fromarray((binary * 255).astype(np.uint8))
-            
-            # Remove noise
-            img = img.filter(ImageFilter.MedianFilter(size=3))
+        # Simple but effective preprocessing
+        img = ImageEnhance.Contrast(img).enhance(2.0)
+        img = ImageEnhance.Sharpness(img).enhance(2.0)
+        
+        # Binarize with adaptive threshold
+        img_array = np.array(img)
+        threshold = np.mean(img_array) * 0.85
+        binary = img_array > threshold
+        img = Image.fromarray((binary * 255).astype(np.uint8))
+        
+        # Remove small noise
+        img = img.filter(ImageFilter.MedianFilter(size=2))
         
         return img
         
@@ -274,28 +178,117 @@ def preprocess_image(img_path: str, high_quality: bool = False) -> Image.Image:
         img = Image.open(img_path).convert("L")
         return img
 
-def run_ocr(img_path: str, high_quality: bool = False) -> Tuple[str, str]:
+def aggressive_character_correction(text: str) -> str:
+    """Aggressively fix common OCR character misrecognitions"""
+    
+    # Common word replacements (case insensitive)
+    word_replacements = {
+        # Python keywords
+        r'\belse\b': 'else',
+        r'\bels e\b': 'else',
+        r'\bels e\b': 'else',
+        r'\be1se\b': 'else',
+        r'\bif\b': 'if',
+        r'\bfor\b': 'for',
+        r'\bin\b': 'in',
+        r'\bdef\b': 'def',
+        r'\bdet\b': 'def',
+        r'\bdep\b': 'def',
+        r'\bclass\b': 'class',
+        r'\bimport\b': 'import',
+        r'\bfrom\b': 'from',
+        r'\breturn\b': 'return',
+        r'\bretum\b': 'return',
+        r'\bprint\b': 'print',
+        r'\bpriot\b': 'print',
+        r'\bprinr\b': 'print',
+        r'\bTrue\b': 'True',
+        r'\bFalse\b': 'False',
+        r'\bNone\b': 'None',
+        
+        # Common words in messages
+        r'\binfo\b': 'info',
+        r'\b1nfo\b': 'info',
+        r'\byou\b': 'you',
+        r'\by0u\b': 'you',
+        r'\byou\b': 'you',
+        r'\btest\b': 'test',
+        r'\bte st\b': 'test',
+        r'\blater\b': 'later',
+        r'\bl ater\b': 'later',
+        r'\brunning\b': 'running',
+        r'\brunn1ng\b': 'running',
+        r'\bcodesnap\b': 'codesnap',
+        r'\bc0desnap\b': 'codesnap',
+        r'\bcode snap\b': 'codesnap',
+    }
+    
+    # Apply word replacements
+    result = text
+    for pattern, replacement in word_replacements.items():
+        result = re.sub(pattern, replacement, result, flags=re.IGNORECASE)
+    
+    # Character-level fixes
+    char_fixes = [
+        ('1', 'l'),  # 1 to l (common in text)
+        ('0', 'o'),  # 0 to o (common in text)
+        ('5', 's'),  # 5 to s
+        ('8', 'b'),  # 8 to b
+        ('2', 'z'),  # 2 to z
+        ('4', 'a'),  # 4 to a
+        ('3', 'e'),  # 3 to e
+    ]
+    
+    # Apply character fixes carefully (only in context)
+    lines = result.split('\n')
+    fixed_lines = []
+    
+    for line in lines:
+        # Don't modify numbers in code contexts
+        if re.search(r'[0-9][=<>!]', line) or re.search(r'[=<>!][0-9]', line):
+            # Likely contains numbers in code, be careful
+            fixed_lines.append(line)
+            continue
+        
+        # Apply fixes
+        fixed_line = line
+        for old, new in char_fixes:
+            # Only replace if it looks like text, not numbers
+            if re.search(r'\b' + old + r'[a-z]', line, re.IGNORECASE) or \
+               re.search(r'[a-z]' + old + r'\b', line, re.IGNORECASE):
+                fixed_line = fixed_line.replace(old, new)
+        
+        fixed_lines.append(fixed_line)
+    
+    return '\n'.join(fixed_lines)
+
+def run_ocr(img_path: str, high_quality: bool = False) -> str:
     """Run OCR with improved configuration"""
     try:
         img = preprocess_image(img_path, high_quality)
         
         # Try multiple OCR configurations
         configs = [
-            ('--oem 3 --psm 6', 'eng'),  # Default
-            ('--oem 3 --psm 7', 'eng'),  # Single text line
-            ('--oem 3 --psm 8', 'eng'),  # Single word
-            ('--oem 1 --psm 6', 'eng'),  # Legacy engine
+            '--oem 3 --psm 6',  # Default - single uniform block of text
+            '--oem 3 --psm 7',  # Single text line
+            '--oem 1 --psm 6',  # Legacy engine
         ]
         
         best_text = ""
         best_score = 0
         
-        for config, lang in configs:
+        for config in configs:
             try:
-                text = pytesseract.image_to_string(img, config=config, lang=lang)
+                text = pytesseract.image_to_string(img, config=config, lang='eng')
                 if text.strip():
-                    # Score based on alphanumeric content
+                    # Score based on alphanumeric content and common patterns
                     score = len(re.findall(r'[a-zA-Z0-9_]+', text))
+                    # Bonus for code-like patterns
+                    if re.search(r'\b(def|class|import|if|else|for)\b', text):
+                        score += 20
+                    if re.search(r'[=<>!]', text):
+                        score += 10
+                    
                     if score > best_score:
                         best_score = score
                         best_text = text
@@ -303,15 +296,14 @@ def run_ocr(img_path: str, high_quality: bool = False) -> Tuple[str, str]:
                 continue
         
         if best_text:
-            return best_text, 'eng'
+            return best_text
         else:
             # Ultimate fallback
-            text = pytesseract.image_to_string(img, lang='eng')
-            return text, 'eng'
+            return pytesseract.image_to_string(img, lang='eng')
             
     except Exception as e:
         print(f"[codesnap] OCR error: {e}", file=sys.stderr)
-        return "", 'eng'
+        return ""
 
 # ─── Multiple capture methods for GNOME Wayland ──────────────────────────
 def capture_with_gnome_screenshot(tmp_img: str) -> bool:
@@ -408,41 +400,10 @@ def capture_region(tmp_img: str) -> bool:
     print("[codesnap] Automatic selection failed. Falling back to manual input.", file=sys.stderr)
     return capture_manual(tmp_img)
 
-# ─── clean text ────────────────────────────────────────────────────────────
-def clean_ocr(raw: str) -> str:
-    """Clean and fix OCR output"""
-    if not raw:
-        return ""
-    
-    # Apply keyword fixes
-    text = raw
-    for pattern, replacement in KEYWORD_FIXES.items():
-        text = re.sub(pattern, replacement, text, flags=re.IGNORECASE)
-    
-    # Fix common character issues
-    text = re.sub(r'[|l]', 'I', text)
-    text = re.sub(r'[Oo]', '0', text)
-    text = re.sub(r'[Ii]', '1', text)
-    
-    # Fix line endings
-    text = text.replace('\r\n', '\n').replace('\r', '\n')
-    lines = [line.rstrip() for line in text.split('\n')]
-    
-    # Remove empty lines at start and end
-    while lines and not lines[0].strip():
-        lines.pop(0)
-    while lines and not lines[-1].strip():
-        lines.pop()
-    
-    return '\n'.join(lines)
-
 # ─── language detection ────────────────────────────────────────────────────
 LANG_HINTS: Dict[str, list[str]] = {
     'python': [r'\bdef\b', r'\bimport\b', r':\s*$', r'\bself\b', r'print\('],
     'javascript': [r'\bconst\b', r'\blet\b', r'=>', r'console\.', r'function\s*\('],
-    'typescript': [r':\s*(string|number|boolean)', r'\binterface\b'],
-    'java': [r'\bpublic\b', r'\bclass\b', r'\bSystem\.out\.'],
-    'cpp': [r'#include', r'\bstd::', r'\bint main\b'],
     'bash': [r'^#!/', r'\becho\b', r'\bexport\b'],
 }
 
@@ -460,10 +421,6 @@ def detect_language(code: str) -> str:
     return max(scores, key=scores.get) if scores else 'text'
 
 # ─── formatter & clipboard ─────────────────────────────────────────────────
-def format_code(code: str, lang: str) -> str:
-    """Format code based on language"""
-    return code  # Simplified for now
-
 def copy_to_clipboard(text: str) -> None:
     """Copy text to clipboard using wl-copy"""
     try:
@@ -505,41 +462,48 @@ def main() -> None:
             die("Failed to capture screenshot.")
 
         print("[codesnap] Processing image...", file=sys.stderr)
-        raw_text, detected_lang = run_ocr(img_path, args.high_quality)
+        raw_text = run_ocr(img_path, args.high_quality)
 
         if not raw_text.strip():
             notify("codesnap", "No text found in the selected area.", "dialog-warning")
             print("[codesnap] No text detected. Try selecting a larger area with clear text.", file=sys.stderr)
             sys.exit(0)
 
-        clean = clean_ocr(raw_text)
+        # Apply aggressive character correction
+        corrected_text = aggressive_character_correction(raw_text)
         
         if args.interactive:
             print("\n" + "="*60)
-            print("OCR RESULT:")
+            print("OCR RESULT (after correction):")
             print("="*60)
-            print(clean)
+            print(corrected_text)
             print("="*60)
             response = input("\nEdit text? [y/N]: ").strip().lower()
             if response == 'y':
                 with tempfile.NamedTemporaryFile(mode='w+', suffix='.txt', delete=False) as f:
-                    f.write(clean)
+                    f.write(corrected_text)
                     temp_path = f.name
                 editor = os.environ.get('EDITOR', 'nano')
                 subprocess.call([editor, temp_path])
                 with open(temp_path, 'r') as f:
-                    clean = f.read()
+                    corrected_text = f.read()
                 os.unlink(temp_path)
         
-        lang = detect_language(clean)
-        formatted = format_code(clean, lang)
-
-        copy_to_clipboard(formatted)
-
-        line_count = sum(1 for line in formatted.split('\n') if line.strip())
-
+        lang = detect_language(corrected_text)
+        
+        copy_to_clipboard(corrected_text)
+        
+        line_count = sum(1 for line in corrected_text.split('\n') if line.strip())
+        
         notify("codesnap ✓", f"{lang.capitalize()} • {line_count} lines copied", "edit-copy")
         print(f"[codesnap] Success: {lang} • {line_count} lines", file=sys.stderr)
+        
+        # Preview the corrected text
+        preview = corrected_text[:200] + "..." if len(corrected_text) > 200 else corrected_text
+        print(f"\n[codesnap] Preview:\n{preview}\n", file=sys.stderr)
 
 if __name__ == '__main__':
     main()
+    
+    
+
