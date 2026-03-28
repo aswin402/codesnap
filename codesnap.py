@@ -39,7 +39,7 @@ except ImportError:
     pass
 
 # ─── version information ────────────────────────────────────────────────────
-__version__ = "2.2.2"
+__version__ = "2.3.0"
 __author__ = "codesnap"
 __description__ = "Offline code extractor for Ubuntu Wayland (GNOME) with aggressive character correction"
 

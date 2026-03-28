@@ -24,7 +24,7 @@ success() { echo -e "${BLUE}🎉${NC} $*"; }
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║       codesnap installer v2.2        ║"
+echo "║       codesnap installer v2.3        ║"
 echo "║   Multi-Language OCR for Wayland     ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
@@ -169,7 +169,7 @@ fi
 # Final success message
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║ ✅ codesnap v2.2 installed successfully!                 ║"
+echo "║ ✅ codesnap v2.3 installed successfully!                 ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 echo "📸 How to use:"
