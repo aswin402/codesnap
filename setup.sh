@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # codesnap setup for Ubuntu 24.04+ (Wayland + GNOME)
 # Fixed for GNOME Wayland compatibility
+# Version 2.2 with enhanced multi-language OCR
 
 set -e
 
@@ -12,17 +13,19 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 RED='\033[0;31m'
 CYAN='\033[0;36m'
+BLUE='\033[0;34m'
 NC='\033[0m'
 
 info() { echo -e "${GREEN}✓${NC} $*"; }
 warn() { echo -e "${YELLOW}⚠${NC} $*"; }
 error() { echo -e "${RED}✗${NC} $*"; exit 1; }
 step() { echo -e "\n${CYAN}▸${NC} $*"; }
+success() { echo -e "${BLUE}🎉${NC} $*"; }
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║       codesnap installer v2          ║"
-echo "║      (GNOME Wayland fixed)           ║"
+echo "║       codesnap installer v2.2        ║"
+echo "║   Multi-Language OCR for Wayland     ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
 
@@ -30,6 +33,7 @@ echo ""
 if [[ "$XDG_SESSION_TYPE" != "wayland" ]]; then
     warn "Not running on Wayland. This script is optimized for Wayland."
     warn "If you're on X11, the selection tool may not work properly."
+    echo ""
 fi
 
 # System deps
@@ -41,12 +45,26 @@ sudo apt-get install -y \
     wl-clipboard \
     tesseract-ocr \
     tesseract-ocr-eng \
+    tesseract-ocr-osd \
     libnotify-bin \
     python3 \
     python3-pip \
     python3-venv \
+    python3-dev \
     curl \
-    gnome-screenshot
+    gnome-screenshot \
+    build-essential \
+    libtesseract-dev \
+    libleptonica-dev
+
+# Check if tesseract-all was installed, if not offer to install more languages
+if ! dpkg -l | grep -q tesseract-ocr-all; then
+    echo ""
+    warn "For better OCR accuracy, consider installing additional languages:"
+    echo "   sudo apt install tesseract-ocr-all"
+    echo "   (This will install all language packs for better recognition)"
+    echo ""
+fi
 
 info "System packages installed"
 
@@ -74,8 +92,18 @@ rm -rf .venv
 uv venv --python 3.12
 source .venv/bin/activate
 
+# Install Python packages
 uv pip install --upgrade pip
-uv pip install pytesseract pillow autopep8
+
+info "Installing core packages..."
+uv pip install pytesseract pillow numpy autopep8
+
+info "Installing optional packages for enhanced OCR..."
+uv pip install scikit-image scipy || warn "Optional packages failed to install (OCR will still work with basic mode)"
+
+# Verify installations
+info "Verifying installations..."
+python -c "import pytesseract; import PIL; import numpy" 2>/dev/null && info "Core packages OK" || warn "Some core packages missing"
 
 info "Python packages installed"
 
@@ -83,7 +111,11 @@ deactivate
 
 # Copy the Python script
 step "Installing codesnap.py..."
-cp "$SCRIPT_DIR/codesnap.py" "$APP_DIR/codesnap.py"
+if [ -f "$SCRIPT_DIR/codesnap.py" ]; then
+    cp "$SCRIPT_DIR/codesnap.py" "$APP_DIR/codesnap.py"
+else
+    error "codesnap.py not found in $SCRIPT_DIR"
+fi
 chmod +x "$APP_DIR/codesnap.py"
 info "Python script installed to $APP_DIR/codesnap.py"
 
@@ -95,6 +127,7 @@ cat > "$INSTALL_DIR/codesnap" << 'EOF'
 #!/usr/bin/env bash
 APP_DIR="$HOME/.local/share/codesnap"
 export WAYLAND_DISPLAY="${WAYLAND_DISPLAY:-wayland-0}"
+export PATH="$HOME/.local/bin:$PATH"
 exec "$APP_DIR/.venv/bin/python" "$APP_DIR/codesnap.py" "$@"
 EOF
 
@@ -121,26 +154,59 @@ gsettings set org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:"$B
 
 info "Hotkey registered"
 
+# Check PATH and offer to add if needed
+echo ""
+if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
+    warn "~/./local/bin not in PATH"
+    echo ""
+    echo "Add this to your ~/.bashrc or ~/.zshrc:"
+    echo '  export PATH="$HOME/.local/bin:$PATH"'
+    echo ""
+    echo "Then run: source ~/.bashrc (or restart terminal)"
+    echo ""
+fi
+
+# Final success message
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║ ✅ codesnap v2 installed successfully!                   ║"
+echo "║ ✅ codesnap v2.2 installed successfully!                 ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 echo "📸 How to use:"
-echo "   1. Press Super + Shift + L"
-echo "   2. Select code area (try slurp first, then GNOME screenshot)"
-echo "   3. Code is automatically copied to clipboard"
-echo "   4. Paste with Ctrl+V"
+echo "   ${GREEN}Basic usage:${NC}"
+echo "   • Press Super + Shift + L"
+echo "   • Or run: codesnap"
 echo ""
-echo "🔧 If slurp doesn't work, the script will automatically:"
-echo "   • Fall back to GNOME's screenshot tool"
-echo "   • Or prompt for manual coordinates"
+echo "   ${GREEN}Advanced options:${NC}"
+echo "   • ${CYAN}codesnap --interactive${NC}    - Edit OCR results before copying"
+echo "   • ${CYAN}codesnap --high-quality${NC}   - Enhanced preprocessing (slower but better)"
+echo "   • ${CYAN}codesnap --version${NC}        - Show version and installed components"
 echo ""
-echo "Test it now: codesnap"
+echo "✨ New in v2.2:"
+echo "   • Multi-language OCR support"
+echo "   • Automatic language detection"
+echo "   • Enhanced preprocessing with --high-quality flag"
+echo "   • Better code recognition for 10+ languages"
+echo ""
+echo "🔧 Troubleshooting:"
+echo "   • If slurp doesn't work, the script falls back to GNOME screenshot"
+echo "   • For better accuracy: codesnap --high-quality"
+echo "   • To see what's installed: codesnap --version"
+echo ""
+echo "Test it now: ${CYAN}codesnap${NC}"
 echo ""
 
-if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
-    echo "💡 Add to PATH (if not already):"
-    echo '   export PATH="$HOME/.local/bin:$PATH"'
+# Offer to test the installation
+read -p "Do you want to test codesnap now? (y/N) " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
     echo ""
+    step "Testing codesnap..."
+    codesnap --version
+    echo ""
+    success "Test completed! Try capturing some code with: codesnap"
+else
+    info "You can test later by running: codesnap"
 fi
+
+
