@@ -1,36 +1,62 @@
 # codesnap
 
-Offline code extractor for Ubuntu (Wayland). Press a hotkey, draw a box around
-any code on screen — YouTube video, tutorial, PDF — and the cleaned, formatted
-code is instantly on your clipboard.
+Offline code extractor for Ubuntu (Wayland / GNOME). Press a hotkey, draw a box around
+any code on screen — YouTube video, tutorial, PDF, IDE screenshot — and the cleaned, formatted
+code is instantly placed on your clipboard.
+
+## Features
+
+- **Instant Capture**: Crosshair selection via `slurp` and `grim` (Wayland native).
+- **Dark Mode Auto-Detection**: Automatically detects dark IDE themes and inverts polarity for maximum OCR clarity.
+- **Accurate Code OCR**: Tesseract engine optimized for uniform code blocks (`--psm 6`).
+- **Safe Character Normalization**: Repairs OCR confusion (`det` $\rightarrow$ `def`, stray margin pipes) without corrupting numbers or identifiers like `utf8` or `col0`.
+- **Lightning-Fast Formatting**: Automatically formats Python code using **Ruff** (written in Rust).
+- **11+ Supported Languages**: Auto-detects Python, JavaScript, TypeScript, Bash, Rust, Go, C, C++, Java, SQL, HTML, and CSS.
+- **Offline & Private**: Zero external network requests; runs 100% locally.
 
 ## Requirements
 
 - Ubuntu 23.04+ (Wayland / GNOME)
-- Python 3.8+
-- No internet needed after install
+- Python 3.10+
+- `uv` (installed automatically by setup script if missing)
 
 ## Install
 
 ```bash
-git clone <this-repo>   # or just download the folder
+git clone <this-repo>
 cd codesnap
 chmod +x setup.sh
 ./setup.sh
-codesnap --version
-codesnap
 ```
 
-The setup script installs: `grim`, `slurp`, `tesseract-ocr`, `wl-clipboard`,
-`libnotify-bin`, and the `autopep8` Python formatter.
+Verify the installation:
+```bash
+codesnap --version
+```
 
 ## Usage
 
 1. Press **Super + Shift + L**
-2. Your cursor becomes a crosshair — click and drag to select the code region
-3. Release — codesnap extracts and cleans the code
-4. A notification confirms: `Python • 12 lines • Ctrl+V ready`
+2. Your cursor becomes a crosshair — click and drag to select the code region (press **Esc** anytime to cancel).
+3. Release — codesnap extracts, cleans, and formats the code.
+4. A desktop notification confirms: `Python • 12 lines copied`
 5. Paste anywhere with **Ctrl+V**
+
+### Advanced Options
+
+```bash
+# Review and edit OCR output in $EDITOR before copying
+codesnap --interactive
+
+# Enhanced preprocessing for low-resolution or fuzzy screenshots
+codesnap --high-quality
+
+# Extract code directly from an existing image file
+codesnap /path/to/screenshot.png
+
+# Show diagnostic info and system tool health
+codesnap --version
+```
 
 ## How it works
 
@@ -38,40 +64,78 @@ The setup script installs: `grim`, `slurp`, `tesseract-ocr`, `wl-clipboard`,
 Super+Shift+L
      │
      ▼
-slurp  ──→  select screen region (crosshair UI)
+slurp  ──→  select screen region (Esc cancels cleanly)
      │
      ▼
-grim   ──→  screenshot that region  →  temp .png
+grim   ──→  screenshot region  →  temporary PNG
      │
      ▼
-tesseract ──→  OCR with --psm 6 (uniform text block)
+image  ──→  detect dark mode, invert, upscale, contrast & denoise
      │
      ▼
-clean  ──→  fix OCR noise (| vs l, indentation, stray chars)
+tesseract ─→ OCR uniform text block (--psm 6)
      │
      ▼
-detect ──→  identify language (Python, JS, Bash, etc.)
+cleaner ──→ fix OCR artifacts (stray margin pipes, split keywords)
      │
      ▼
-format ──→  autopep8 for Python, passthrough for others
+detect ──→  identify language (Python, TS, JS, Rust, Go, Bash, etc.)
      │
      ▼
-wl-copy ──→  clipboard
+format ──→  fast Ruff formatting for Python (passthrough for others)
      │
      ▼
-notify-send ──→  "Code copied!"
+wl-copy ──→ clipboard
+     │
+     ▼
+notify ───→ desktop notification
 ```
 
-## Supported Languages (auto-detected)
+## Project Architecture
 
-Python, JavaScript, TypeScript, Bash, Java, C, C++, Rust, Go, SQL, HTML, CSS
+```
+codesnap/
+├── pyproject.toml        — modern build metadata & dependency manifest
+├── codesnap.py           — backward-compatible CLI entrypoint
+├── setup.sh              — installation & hotkey registration script
+├── src/codesnap/
+│   ├── __init__.py       — package metadata
+│   ├── cli.py            — CLI entrypoint & pipeline orchestration
+│   ├── capture.py        — Wayland screen selection & capture
+│   ├── image.py          — preprocessing & dark theme polarity inversion
+│   ├── ocr.py            — Tesseract OCR pipeline & fallbacks
+│   ├── cleaner.py        — AST/token safe character correction
+│   ├── languages.py      — multi-language detection patterns
+│   ├── formatters.py     — fast Ruff code formatter integration
+│   ├── clipboard.py      — wl-copy / xclip & notification handlers
+│   └── exceptions.py     — typed exceptions
+└── tests/
+    ├── test_capture.py
+    ├── test_cleaner.py
+    ├── test_cli.py
+    ├── test_formatters.py
+    ├── test_image.py
+    └── test_languages.py
+```
 
-## Tips
+## Development & Testing
 
-- **Zoom in** on the video before snapping — bigger text = better OCR accuracy
-- **Pause the video** so text is sharp and not motion-blurred
-- Include a little padding around the code block when selecting
-- Works on any app: browser, PDF viewer, terminal, VS Code screenshots
+Run tests and linting with `uv` and `ruff`:
+
+```bash
+# Run unit test suite
+uv run pytest
+
+# Run linting
+uv run ruff check .
+
+# Run code formatter
+uv run ruff format .
+```
+
+## Changelog
+
+See [CHANGELOG.md](file:///home/aswin/programming/vscode/myProjects/codesnap/CHANGELOG.md) for version history, bug fixes, and feature notes.
 
 ## Uninstall
 
@@ -80,14 +144,6 @@ rm -rf ~/.local/share/codesnap
 rm ~/.local/bin/codesnap
 ```
 
-Then remove the hotkey in **Settings → Keyboard → Custom Shortcuts**.
+Then remove the shortcut in **Settings → Keyboard → Custom Shortcuts**.
 
-## Files
-
-```
-codesnap/
-├── codesnap.py   — main script
-├── setup.sh      — installer + hotkey registration
-└── README.md     — this file
-```
-
+### vibe coded by Aswin
