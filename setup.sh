@@ -42,6 +42,7 @@ sudo apt-get install -y \
     grim \
     slurp \
     wl-clipboard \
+    gnome-screenshot \
     tesseract-ocr \
     tesseract-ocr-eng \
     libnotify-bin \

@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Pillow Filter Crash**: Fixed `ValueError: bad filter size` by updating `MedianFilter(size=2)` to a valid odd integer (`size=3`), resolving an exception that was silently aborting image preprocessing on every run.
 - **Character Corruption**: Replaced dangerous line-wide substring replacements (which previously turned numbers like `100` into `1oo` or variables like `col0` into `colo`) with safe, token-level OCR normalization.
 - **Cancelation Process Hang**: Fixed issue where pressing `Esc` during screen selection fell through to terminal coordinate input and hung the background desktop process.
+- **GNOME Wayland Screen Selection Immediate Cancellation**: Fixed bug where `slurp` failed immediately on GNOME Mutter with `compositor doesn't support zwlr_layer_shell_v1`, causing false `Selection cancelled` notifications. Implemented dual-backend architecture prioritizing `gnome-screenshot -a` on GNOME and `slurp`/`grim` on wlroots compositors (Sway/Hyprland).
 - **Missing Dependency Check**: Added check for `tesseract` binary in `check_system_dependencies()` to provide actionable installation instructions if missing.
 - **Namespace Import Collision**: Fixed import resolution in root `codesnap.py` so it cleanly proxies to `src/codesnap/cli.py` without package name collision.
 
