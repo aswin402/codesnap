@@ -40,6 +40,15 @@ Verify the installation:
 codesnap --version
 ```
 
+## Update
+
+If you already have codesnap installed on your machine, update it in-place without re-running system packages:
+
+```bash
+git pull
+./localupdate.sh
+```
+
 ## Usage
 
 1. Press **Super + Shift + L**
@@ -113,6 +122,7 @@ codesnap/
 ├── pyproject.toml        — modern build metadata & dependency manifest
 ├── codesnap.py           — backward-compatible CLI entrypoint
 ├── setup.sh              — installation & hotkey registration script
+├── localupdate.sh        — fast in-place update script for existing installs
 ├── src/codesnap/
 │   ├── __init__.py       — package metadata
 │   ├── cli.py            — CLI entrypoint & pipeline orchestration

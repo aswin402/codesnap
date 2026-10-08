@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Direct Image File Extraction & Output Routing**: Added optional file path argument (`codesnap [image_path]`), file output flag (`-o`/`--output`), stdout flag (`-c`/`--stdout`), language override (`-l`/`--lang`), and `--no-clipboard`.
 - **Comprehensive Test Suite**: Added 24 automated unit tests across `tests/` covering image preprocessing, character correction, language detection, snippet formatting, CLI arguments, file output, and capture error handling.
 - **GitHub Actions CI Workflow**: Added automated continuous integration pipeline (`.github/workflows/ci.yml`) running Ruff linting, formatting checks, pytest test suite, and distribution package builds on push and pull requests.
+- **Fast In-Place Updater Script**: Added `localupdate.sh` to allow users with existing installations to upgrade their local CLI binary, virtual environment, and packages in-place without re-running system package managers.
 
 ### Fixed
 - **Pillow Filter Crash**: Fixed `ValueError: bad filter size` by updating `MedianFilter(size=2)` to a valid odd integer (`size=3`), resolving an exception that was silently aborting image preprocessing on every run.
