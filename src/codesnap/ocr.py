@@ -1,13 +1,25 @@
 """Optical Character Recognition pipeline using Tesseract."""
 
+import shutil
+
 import pytesseract
 
-from codesnap.exceptions import OCRError
+from codesnap.exceptions import DependencyMissingError, OCRError
 from codesnap.image import preprocess_image
+
+
+def check_ocr_dependencies() -> None:
+    """Verify that tesseract binary exists in PATH."""
+    if not shutil.which("tesseract"):
+        raise DependencyMissingError(
+            "Missing OCR tool: tesseract\nPlease install it via: sudo apt install tesseract-ocr"
+        )
 
 
 def extract_text_from_image(img_path: str, high_quality: bool = False) -> str:
     """Preprocess image and execute OCR using optimal Tesseract configuration."""
+    check_ocr_dependencies()
+
     try:
         processed_img = preprocess_image(img_path, high_quality=high_quality)
     except Exception as e:

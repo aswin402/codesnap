@@ -15,10 +15,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install system dependencies (Tesseract)
+      - name: Install system dependencies (Tesseract & Wayland tools)
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
+          sudo apt-get install -y tesseract-ocr tesseract-ocr-eng grim slurp wl-clipboard
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v5

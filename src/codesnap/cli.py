@@ -15,7 +15,7 @@ from codesnap.clipboard import copy_to_clipboard, send_notification
 from codesnap.exceptions import CaptureCancelledError, CodesnapError
 from codesnap.formatters import format_code
 from codesnap.languages import detect_language
-from codesnap.ocr import extract_text_from_image
+from codesnap.ocr import check_ocr_dependencies, extract_text_from_image
 
 
 def show_version() -> None:
@@ -75,19 +75,27 @@ def main(argv: list[str] | None = None) -> int:
         show_version()
         return 0
 
-    try:
-        check_system_dependencies()
-    except CodesnapError as e:
-        send_notification("codesnap error", str(e), icon="dialog-error")
-        print(f"[codesnap] ERROR: {e}", file=sys.stderr)
-        return 1
+    if args.image:
+        if not os.path.isfile(args.image):
+            print(f"[codesnap] ERROR: File not found: {args.image}", file=sys.stderr)
+            return 1
+        try:
+            check_ocr_dependencies()
+        except CodesnapError as e:
+            send_notification("codesnap error", str(e), icon="dialog-error")
+            print(f"[codesnap] ERROR: {e}", file=sys.stderr)
+            return 1
+    else:
+        try:
+            check_system_dependencies()
+        except CodesnapError as e:
+            send_notification("codesnap error", str(e), icon="dialog-error")
+            print(f"[codesnap] ERROR: {e}", file=sys.stderr)
+            return 1
 
     with tempfile.TemporaryDirectory(prefix="codesnap_") as tmpdir:
         if args.image:
             img_path = args.image
-            if not os.path.isfile(img_path):
-                print(f"[codesnap] ERROR: File not found: {img_path}", file=sys.stderr)
-                return 1
         else:
             img_path = os.path.join(tmpdir, "snap.png")
             send_notification("codesnap", "Select code area", icon="accessories-screenshot")
