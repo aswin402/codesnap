@@ -34,8 +34,7 @@ def check_system_dependencies() -> None:
 
     if not shutil.which("tesseract"):
         raise DependencyMissingError(
-            "Missing OCR tool: tesseract. Please install it via:\n"
-            "  sudo apt install tesseract-ocr"
+            "Missing OCR tool: tesseract. Please install it via:\n  sudo apt install tesseract-ocr"
         )
 
     if not (shutil.which("wl-copy") or shutil.which("xclip")):
