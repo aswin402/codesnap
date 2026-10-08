@@ -1,5 +1,11 @@
 # codesnap
 
+[![CI](https://github.com/aswin402/codesnap/actions/workflows/ci.yml/badge.svg)](https://github.com/aswin402/codesnap/actions/workflows/ci.yml)
+[![Release](https://img.shields.io/github/v/release/aswin402/codesnap)](https://github.com/aswin402/codesnap/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python: >=3.10](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
+
 Offline code extractor for Ubuntu (Wayland / GNOME). Press a hotkey, draw a box around
 any code on screen — YouTube video, tutorial, PDF, IDE screenshot — and the cleaned, formatted
 code is instantly placed on your clipboard.
