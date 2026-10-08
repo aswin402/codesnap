@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Fast Code Formatting with Ruff**: Integrated Rust-based `ruff format` to auto-format extracted Python snippets before copying them to clipboard.
 - **Dark Mode Auto-Detection**: Implemented automatic background polarity detection and auto-inversion in `src/codesnap/image.py` so code captured from dark IDE themes is recognized with high accuracy by Tesseract.
 - **Expanded Multi-Language Support**: Added high-precision token pattern detection for 11 languages (Python, JavaScript, TypeScript, Bash, Rust, Go, SQL, HTML, CSS, C, and Java).
-- **Direct Image File Extraction**: Added optional file path argument (`codesnap [image_path]`) to extract code directly from an existing image file on disk.
-- **Comprehensive Test Suite**: Added 22 automated unit tests across `tests/` covering image preprocessing, character correction, language detection, snippet formatting, CLI arguments, and capture error handling.
+- **Direct Image File Extraction & Output Routing**: Added optional file path argument (`codesnap [image_path]`), file output flag (`-o`/`--output`), stdout flag (`-c`/`--stdout`), language override (`-l`/`--lang`), and `--no-clipboard`.
+- **Comprehensive Test Suite**: Added 24 automated unit tests across `tests/` covering image preprocessing, character correction, language detection, snippet formatting, CLI arguments, file output, and capture error handling.
+- **GitHub Actions CI Workflow**: Added automated continuous integration pipeline (`.github/workflows/ci.yml`) running Ruff linting, formatting checks, pytest test suite, and distribution package builds on push and pull requests.
 
 ### Fixed
 - **Pillow Filter Crash**: Fixed `ValueError: bad filter size` by updating `MedianFilter(size=2)` to a valid odd integer (`size=3`), resolving an exception that was silently aborting image preprocessing on every run.

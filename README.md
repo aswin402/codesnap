@@ -54,6 +54,15 @@ codesnap --high-quality
 # Extract code directly from an existing image file
 codesnap /path/to/screenshot.png
 
+# Save extracted code directly to a file
+codesnap /path/to/screenshot.png -o output.py
+
+# Print extracted code directly to stdout (useful for pipes)
+codesnap /path/to/screenshot.png -c
+
+# Override language auto-detection
+codesnap /path/to/screenshot.png -l rust
+
 # Show diagnostic info and system tool health
 codesnap --version
 ```

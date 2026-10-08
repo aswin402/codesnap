@@ -57,6 +57,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-q", "--high-quality", action="store_true", help="Enhanced image preprocessing"
     )
+    parser.add_argument("-o", "--output", help="Write extracted code to specified file path")
+    parser.add_argument(
+        "-c", "--stdout", action="store_true", help="Print extracted code directly to stdout"
+    )
+    parser.add_argument(
+        "-l", "--lang", help="Override detected programming language (e.g. python, rust, sql)"
+    )
+    parser.add_argument("--no-clipboard", action="store_true", help="Skip copying to clipboard")
     parser.add_argument(
         "image", nargs="?", help="Optional image file to extract code from directly"
     )
@@ -111,8 +119,8 @@ def main(argv: list[str] | None = None) -> int:
         # Post-process and clean OCR output
         cleaned_text = clean_code_text(raw_text)
 
-        # Detect programming language
-        lang = detect_language(cleaned_text)
+        # Detect programming language or use override
+        lang = args.lang.lower() if args.lang else detect_language(cleaned_text)
 
         # Format snippet with ruff if python
         formatted_text = format_code(cleaned_text, lang)
@@ -127,23 +135,36 @@ def main(argv: list[str] | None = None) -> int:
             answer = input("\nEdit text in editor? [y/N]: ").strip().lower()
             if answer == "y":
                 formatted_text = interactive_edit(formatted_text)
-                lang = detect_language(formatted_text)
+                if not args.lang:
+                    lang = detect_language(formatted_text)
 
-        # Copy to clipboard
-        try:
-            copy_to_clipboard(formatted_text)
-        except CodesnapError as e:
-            send_notification("codesnap error", str(e), icon="dialog-error")
-            print(f"[codesnap] ERROR: {e}", file=sys.stderr)
-            return 1
+        # Write to file if -o/--output specified
+        if args.output:
+            try:
+                Path(args.output).write_text(formatted_text, encoding="utf-8")
+            except Exception as e:
+                print(f"[codesnap] ERROR: Failed to write to {args.output}: {e}", file=sys.stderr)
+                return 1
+
+        # Output to stdout if -c/--stdout specified
+        if args.stdout:
+            print(formatted_text)
+
+        # Copy to clipboard unless disabled
+        if not args.no_clipboard:
+            try:
+                copy_to_clipboard(formatted_text)
+            except CodesnapError as e:
+                send_notification("codesnap error", str(e), icon="dialog-error")
+                print(f"[codesnap] ERROR: {e}", file=sys.stderr)
+                return 1
 
         line_count = len([line for line in formatted_text.splitlines() if line.strip()])
-        send_notification(
-            "codesnap ✓", f"{lang.capitalize()} • {line_count} lines copied", icon="edit-copy"
-        )
-        print(
-            f"[codesnap] Success: {lang} • {line_count} lines copied to clipboard", file=sys.stderr
-        )
+        if not args.stdout:
+            send_notification(
+                "codesnap ✓", f"{lang.capitalize()} • {line_count} lines copied", icon="edit-copy"
+            )
+            print(f"[codesnap] Success: {lang} • {line_count} lines processed", file=sys.stderr)
         return 0
 
 
