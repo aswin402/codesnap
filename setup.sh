@@ -23,7 +23,7 @@ success() { echo -e "${BLUE}🎉${NC} $*"; }
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║       codesnap installer v2.4.1      ║"
+echo "║       codesnap installer v2.4.2      ║"
 echo "║   Fast OCR Code Extractor (Wayland)  ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
@@ -77,7 +77,14 @@ cat > "$INSTALL_DIR/codesnap" << 'EOF'
 #!/usr/bin/env bash
 APP_DIR="$HOME/.local/share/codesnap"
 export PATH="$HOME/.local/bin:$PATH"
-exec "$APP_DIR/.venv/bin/codesnap" "$@"
+if [ -t 2 ]; then
+    exec "$APP_DIR/.venv/bin/codesnap" "$@"
+fi
+# Launched without a terminal (e.g. hotkey): keep errors in a log file
+LOG_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/codesnap"
+mkdir -p "$LOG_DIR"
+echo "--- $(date '+%F %T') codesnap $*" >> "$LOG_DIR/codesnap.log"
+exec "$APP_DIR/.venv/bin/codesnap" "$@" 2>> "$LOG_DIR/codesnap.log"
 EOF
 
 chmod +x "$INSTALL_DIR/codesnap"

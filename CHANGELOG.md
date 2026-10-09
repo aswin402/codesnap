@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.2] - 2026-10-10
+
+### Added
+- **Native Wayland XDG Desktop Portal Capture**: Integrated `org.freedesktop.portal.Screenshot` via `jeepney` pure-Python D-Bus client, bringing seamless interactive screen selection and capture to GNOME 40+ / GNOME 50 (Ubuntu 24.04/26.04) on Wayland without relying on unsupported protocols.
+- **Fail-Safe Launcher Logging**: Added automated error and crash diagnostics logging to `~/.cache/codesnap/codesnap.log` when invoked via GNOME custom keyboard shortcut (`Super+Shift+L`) or background desktop launcher.
+- **Portal Fallback Cascade**: Implemented robust backend selector prioritizing XDG Desktop Portal on GNOME Wayland, `slurp`/`grim` on wlroots compositors (Sway, Hyprland), and `gnome-screenshot` on legacy X11 sessions.
+- **Expanded Test Suite**: Added 13 new unit tests covering D-Bus portal response decoding, URI parsing, user cancellation handling, backend detection, and fallback mechanics.
+
+### Fixed
+- **GNOME Wayland Hang & Cancellation**: Resolved issue where GNOME Mutter Wayland sessions aborted screenshot selection or hung in fallback modes due to lack of `zwlr_layer_shell_v1` support in GNOME Shell.
+
 ## [2.4.1] - 2026-10-08
 
 ### Added
