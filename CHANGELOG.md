@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.5] - 2026-10-10
+
+### Added
+- **Minimal Vector Logo & Banner**: Created custom geometric vector SVG logo (`assets/logo.svg`) and README header banner (`assets/banner.svg`) combining screen crop viewfinder brackets with code glyphs, free of AI cliches and emojis.
+- **GitHub Packages Integration**: Added `Dockerfile` and automated OCI container image builds pushing to GitHub Container Registry (`ghcr.io/aswin402/codesnap`) on releases, populating the GitHub repository Packages section.
+- **GitHub Repository Metadata**: Configured official repository description, website URL, and topic tags (`wayland`, `gnome`, `ocr`, `tesseract`, `python`, `code-extractor`, `clipboard`, `developer-tools`, `ruff`).
+
+### Changed
+- **Removed Emoji/Thunder Visuals**: Replaced emoji title with clean vector branding banner across documentation.
+
 ## [2.4.4] - 2026-10-10
 
 ### Added

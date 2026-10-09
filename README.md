@@ -1,6 +1,9 @@
 <div align="center">
 
-# ⚡ codesnap
+<img src="assets/banner.svg" alt="codesnap logo" width="800" />
+
+<br/>
+<br/>
 
 **Instant, offline code extractor for Linux (Wayland & GNOME).**
 

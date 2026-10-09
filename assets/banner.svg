@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bracketGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#818cf8"/>
+      <stop offset="100%" stop-color="#38bdf8"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="textGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#cbd5e1"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Banner Background -->
+  <rect width="800" height="200" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="1.5"/>
+
+  <!-- Logo Mark -->
+  <g transform="translate(60, 36)">
+    <!-- Container Squircle -->
+    <rect x="0" y="0" width="128" height="128" rx="28" fill="#0b0f19" stroke="#334155" stroke-width="1.5"/>
+
+    <!-- Screen Capture Corners -->
+    <g stroke="url(#bracketGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 24 40 L 24 28 A 4 4 0 0 1 28 24 L 40 24" />
+      <path d="M 88 24 L 100 24 A 4 4 0 0 1 104 28 L 104 40" />
+      <path d="M 24 88 L 24 100 A 4 4 0 0 0 28 104 L 40 104" />
+      <path d="M 88 104 L 100 104 A 4 4 0 0 0 104 100 L 104 88" />
+    </g>
+
+    <!-- Center Code Glyph -->
+    <g stroke="#f8fafc" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <path d="M 52 50 L 40 64 L 52 78" />
+      <path d="M 68 46 L 60 82" stroke="url(#bracketGrad)" />
+      <path d="M 76 50 L 88 64 L 76 78" />
+    </g>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(225, 105)">
+    <text font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="52" font-weight="800" letter-spacing="-1.5px" fill="url(#textGrad)">codesnap</text>
+    <text y="34" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="400" fill="#94a3b8" letter-spacing="0.2px">Instant offline code extractor for Linux (Wayland &amp; GNOME)</text>
+  </g>
+</svg>
