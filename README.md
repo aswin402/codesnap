@@ -58,6 +58,7 @@ Standard OCR tools stumble on code: dark themes fail contrast checks, indentatio
 | **Dark Theme IDEs** | ❌ Poor contrast, missing symbols | ✅ Automatic polarity detection & contrast inversion |
 | **OCR Code Cleaning** | ❌ Leaves stray `\|`, broken `def` | ✅ AST-safe token correction (preserves `100`, `utf8`) |
 | **Indentation & Formatting**| ❌ Random tabs, mangled blocks | ✅ Instant auto-formatting via **Ruff** (written in Rust) |
+| **Resource Footprint** | ⚠️ Heavy wheels (`numpy`), 100MB+ | ✅ Zero NumPy bloat — C-accelerated Pillow, <400ms runtime |
 | **Language Intelligence** | ❌ Plain unformatted text | ✅ 11+ languages auto-detected & highlighted |
 | **Privacy & Security** | ⚠️ Often calls cloud APIs | ✅ 100% offline and local — zero network requests |
 
@@ -65,9 +66,23 @@ Standard OCR tools stumble on code: dark themes fail contrast checks, indentatio
 
 ## 🚀 Quick Start
 
-### 1. Installation
+### Option A: One-Liner Install (Recommended)
 
-One-command setup that configures the Python virtual environment via `uv`, compiles dependencies, and registers the global GNOME shortcut:
+Run this single command in your terminal. It installs system tools, configures the environment with `uv`, and registers <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>:
+
+```bash
+curl -sSL https://raw.githubusercontent.com/aswin402/codesnap/main/setup.sh | bash
+```
+
+### Option B: Modern `uv tool` Install
+
+If you already use `uv`, you can install `codesnap` globally into an isolated environment with one command:
+
+```bash
+uv tool install git+https://github.com/aswin402/codesnap.git
+```
+
+### Option C: Install from Source
 
 ```bash
 git clone https://github.com/aswin402/codesnap.git

@@ -23,7 +23,7 @@ success() { echo -e "${BLUE}🎉${NC} $*"; }
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║       codesnap installer v2.4.2      ║"
+echo "║       codesnap installer v2.4.3      ║"
 echo "║   Fast OCR Code Extractor (Wayland)  ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
@@ -47,7 +47,8 @@ sudo apt-get install -y \
     tesseract-ocr-eng \
     libnotify-bin \
     python3 \
-    curl
+    curl \
+    git
 
 info "System packages installed"
 
@@ -59,13 +60,20 @@ if ! command -v uv &> /dev/null; then
 fi
 info "uv ready"
 
+# Determine source location (local repo or piped from curl)
+if [ -f "$SCRIPT_DIR/pyproject.toml" ]; then
+    INSTALL_SOURCE="$SCRIPT_DIR"
+else
+    INSTALL_SOURCE="git+https://github.com/aswin402/codesnap.git"
+fi
+
 # Python env
 step "Creating uv virtual environment and installing codesnap..."
 mkdir -p "$APP_DIR"
 rm -rf "$APP_DIR/.venv"
 uv venv "$APP_DIR/.venv"
 
-VIRTUAL_ENV="$APP_DIR/.venv" uv pip install "$SCRIPT_DIR"
+VIRTUAL_ENV="$APP_DIR/.venv" uv pip install "$INSTALL_SOURCE"
 
 info "codesnap package and dependencies installed in virtual environment"
 
@@ -120,7 +128,7 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 fi
 
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║ ✅ codesnap v2.4.1 installed successfully!               ║"
+echo "║ ✅ codesnap v2.4.3 installed successfully!               ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 echo "📸 How to use:"

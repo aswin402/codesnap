@@ -50,6 +50,7 @@ fi
 
 # Install / update current package into the application venv
 VIRTUAL_ENV="$APP_DIR/.venv" uv pip install --upgrade "$SCRIPT_DIR"
+VIRTUAL_ENV="$APP_DIR/.venv" uv pip uninstall -y numpy &>/dev/null || true
 
 # Clean up legacy root script if present in APP_DIR to prevent stale code execution
 if [ -f "$APP_DIR/codesnap.py" ]; then

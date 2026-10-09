@@ -1,25 +1,28 @@
 """Image preprocessing routines for improved OCR accuracy."""
 
-import numpy as np
-from PIL import Image, ImageEnhance, ImageFilter, ImageOps
+from PIL import Image, ImageEnhance, ImageFilter, ImageOps, ImageStat
 
 
 def is_dark_image(img: Image.Image) -> bool:
     """Determine whether an image has a predominantly dark background."""
     gray = img.convert("L")
-    arr = np.array(gray)
-    # Check corners and borders where background usually resides
-    h, w = arr.shape
-    border_pixels = np.concatenate(
-        [
-            arr[0, :],
-            arr[-1, :],
-            arr[:, 0],
-            arr[:, -1],
-        ]
+    w, h = gray.size
+    # Sample border pixels (top, bottom, left, right) where background usually resides
+    top = gray.crop((0, 0, w, 1))
+    bottom = gray.crop((0, h - 1, w, h))
+    left = gray.crop((0, 0, 1, h))
+    right = gray.crop((w - 1, 0, w, h))
+
+    border_sum = (
+        ImageStat.Stat(top).sum[0]
+        + ImageStat.Stat(bottom).sum[0]
+        + ImageStat.Stat(left).sum[0]
+        + ImageStat.Stat(right).sum[0]
     )
-    border_mean = float(np.mean(border_pixels))
-    overall_mean = float(np.mean(arr))
+    border_pixels = 2 * (w + h)
+    border_mean = border_sum / max(border_pixels, 1)
+    overall_mean = ImageStat.Stat(gray).mean[0]
+
     # If border or overall brightness is low, it is dark mode
     return border_mean < 128 or overall_mean < 110
 
@@ -59,11 +62,10 @@ def preprocess_image(img_path: str, high_quality: bool = False) -> Image.Image:
     gray = ImageEnhance.Contrast(gray).enhance(2.0)
     gray = ImageEnhance.Sharpness(gray).enhance(2.0)
 
-    # Binarize with threshold
-    arr = np.array(gray)
-    threshold = float(np.mean(arr) * 0.88)
-    binary = arr > threshold
-    out_img = Image.fromarray((binary * 255).astype(np.uint8))
+    # Binarize with threshold using fast C-level lookup table
+    threshold = int(ImageStat.Stat(gray).mean[0] * 0.88)
+    lut = [255 if i > threshold else 0 for i in range(256)]
+    out_img = gray.point(lut, mode="L")
 
     # Remove small salt-and-pepper noise using valid odd filter size (size=3)
     out_img = out_img.filter(ImageFilter.MedianFilter(size=3))

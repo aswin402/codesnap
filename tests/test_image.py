@@ -1,5 +1,4 @@
-import numpy as np
-from PIL import Image
+from PIL import Image, ImageDraw
 
 from codesnap.image import is_dark_image, preprocess_image
 
@@ -17,9 +16,9 @@ def test_is_dark_image():
 def test_preprocess_image_does_not_crash(tmp_path):
     # Create test image with dark background and white text
     img_path = tmp_path / "test.png"
-    arr = np.zeros((200, 400), dtype=np.uint8)
-    arr[50:150, 50:350] = 255  # bright block
-    img = Image.fromarray(arr)
+    img = Image.new("L", (400, 200), color=0)
+    draw = ImageDraw.Draw(img)
+    draw.rectangle([50, 50, 350, 150], fill=255)
     img.save(img_path)
 
     # Preprocessing must succeed and return a valid PIL image

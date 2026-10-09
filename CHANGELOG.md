@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.3] - 2026-10-10
+
+### Added
+- **One-Liner Install Support**: Made `setup.sh` pipe-friendly for direct `curl -sSL https://raw.githubusercontent.com/aswin402/codesnap/main/setup.sh | bash` installations and added official documentation for `uv tool install`.
+- **Automatic Stale Dependency Cleanup**: Enhanced `localupdate.sh` to purge `numpy` from existing virtual environments, immediately reclaiming ~35MB of disk space on upgraded systems.
+
+### Changed
+- **Pure-Pillow Image Preprocessing**: Replaced `numpy` with Pillow's C-accelerated `ImageStat.Stat` for background luminance detection and fast 256-entry lookup table (`point LUT`) for image binarization, halving test suite execution time and reducing idle memory consumption.
+
+### Removed
+- **Removed `numpy` Dependency**: Dropped `numpy` requirement from `pyproject.toml`, trimming the distribution and virtual environment size by over 35MB.
+
 ## [2.4.2] - 2026-10-10
 
 ### Added
