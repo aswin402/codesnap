@@ -12,6 +12,7 @@
 <br/>
 
 [![CI](https://github.com/aswin402/codesnap/actions/workflows/ci.yml/badge.svg)](https://github.com/aswin402/codesnap/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/codesnap-cli.svg?color=blue)](https://pypi.org/project/codesnap-cli/)
 [![Release](https://img.shields.io/github/v/release/aswin402/codesnap?color=blue)](https://github.com/aswin402/codesnap/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](https://opensource.org/licenses/MIT)
 [![Python: >=3.10](https://img.shields.io/badge/Python-3.10+-3776ab.svg?logo=python&logoColor=white)](https://www.python.org/)
@@ -68,7 +69,7 @@ Standard OCR tools stumble on code: dark themes fail contrast checks, indentatio
 ---
 
 ## 🚀 Quick Start
-
+ 
 ### Option A: One-Liner Install (Recommended)
 
 Run this single command in your terminal. It installs system tools, configures the environment with `uv`, and registers <kbd>Super</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>:
@@ -77,12 +78,19 @@ Run this single command in your terminal. It installs system tools, configures t
 curl -sSL https://raw.githubusercontent.com/aswin402/codesnap/main/setup.sh | bash
 ```
 
-### Option B: Modern `uv tool` Install
+### Option B: Install via PyPI (`pip` / `uv`)
 
-If you already use `uv`, you can install `codesnap` globally into an isolated environment with one command:
+Install globally as a CLI tool:
 
 ```bash
-uv tool install git+https://github.com/aswin402/codesnap.git
+# Using uv (fastest & recommended)
+uv tool install codesnap-cli
+
+# Run instantly without installing
+uvx codesnap-cli
+
+# Or using standard pip
+pip install codesnap-cli
 ```
 
 ### Option C: Install from Source

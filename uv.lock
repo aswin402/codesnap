@@ -8,8 +8,8 @@ resolution-markers = [
 ]
 
 [[package]]
-name = "codesnap"
-version = "2.4.5"
+name = "codesnap-cli"
+version = "2.4.6"
 source = { editable = "." }
 dependencies = [
     { name = "jeepney" },

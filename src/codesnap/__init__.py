@@ -1,6 +1,6 @@
 """codesnap — Offline code extractor for Ubuntu Wayland (GNOME)"""
 
-__version__ = "2.4.5"
+__version__ = "2.4.6"
 __author__ = "codesnap"
 __description__ = (
     "Offline code extractor for Ubuntu Wayland (GNOME) with smart character correction"

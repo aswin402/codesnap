@@ -3,19 +3,39 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "codesnap"
-version = "2.4.5"
-description = "Offline code extractor for Ubuntu Wayland (GNOME)"
+name = "codesnap-cli"
+version = "2.4.6"
+description = "Instant offline code extractor for Linux (Wayland & GNOME) with smart OCR and auto-formatting"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "codesnap" }]
+authors = [{ name = "codesnap", email = "aswin@example.com" }]
 license = { text = "MIT" }
+keywords = ["ocr", "wayland", "gnome", "tesseract", "clipboard", "code-extractor", "developer-tools", "ruff"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Environment :: X11 Applications :: Gnome",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Utilities",
+]
 dependencies = [
     "pillow>=10.0.0",
     "pytesseract>=0.3.10",
     "ruff>=0.4.0",
     "jeepney>=0.8",
 ]
+
+[project.urls]
+Homepage = "https://github.com/aswin402/codesnap"
+Repository = "https://github.com/aswin402/codesnap"
+Issues = "https://github.com/aswin402/codesnap/issues"
+Changelog = "https://github.com/aswin402/codesnap/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
 dev = [
