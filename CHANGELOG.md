@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.4] - 2026-10-10
+
+### Added
+- **Multi-Language Snippet Formatting**: Extended the formatter engine beyond Python (`ruff`) to natively support Rust (`rustfmt`), Go (`gofmt`), JavaScript/TypeScript/JSON (`biome` / `prettier`), Bash (`shfmt`), C/C++ (`clang-format`), and HTML/CSS (`prettier` / `biome`).
+- **Zero-Dependency Graceful Fallback**: If an external formatter tool is not installed on the system, `codesnap` automatically preserves normalized code without failing or adding latency.
+- **Automated GitHub Releases & PyPI Publishing CI**: Added `.github/workflows/release.yml` triggered on `v*` tags to compile wheel and sdist distributions via `uv build`, automatically publish GitHub Releases with release notes, and publish to PyPI.
+- **Expanded Formatter Test Suite**: Added 9 new unit tests covering multi-language formatting paths, mock tool executions, and timeout resilience (total 46 tests).
+
 ## [2.4.3] - 2026-10-10
 
 ### Added

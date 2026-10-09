@@ -57,7 +57,7 @@ Standard OCR tools stumble on code: dark themes fail contrast checks, indentatio
 | **Wayland Support** | ❌ Fails on Mutter / GNOME 40+ | ✅ Native XDG Desktop Portal + `slurp` fallback |
 | **Dark Theme IDEs** | ❌ Poor contrast, missing symbols | ✅ Automatic polarity detection & contrast inversion |
 | **OCR Code Cleaning** | ❌ Leaves stray `\|`, broken `def` | ✅ AST-safe token correction (preserves `100`, `utf8`) |
-| **Indentation & Formatting**| ❌ Random tabs, mangled blocks | ✅ Instant auto-formatting via **Ruff** (written in Rust) |
+| **Indentation & Formatting**| ❌ Random tabs, mangled blocks | ✅ Multi-language auto-formatting (Ruff, rustfmt, gofmt, biome, prettier) |
 | **Resource Footprint** | ⚠️ Heavy wheels (`numpy`), 100MB+ | ✅ Zero NumPy bloat — C-accelerated Pillow, <400ms runtime |
 | **Language Intelligence** | ❌ Plain unformatted text | ✅ 11+ languages auto-detected & highlighted |
 | **Privacy & Security** | ⚠️ Often calls cloud APIs | ✅ 100% offline and local — zero network requests |
@@ -163,13 +163,38 @@ flowchart TD
     
     J --> K["Smart Character Cleaner"]
     K --> L["Multi-Language Detector (11+ Languages)"]
-    L --> M{"Is Python?"}
-    M -->|"Yes"| N["Ruff Formatter (Rust engine)"]
-    M -->|"Other"| O["Clean Normalized Code"]
-    N --> P["wl-copy / xclip Clipboard"]
+    L --> M{"Formatter Available?"}
+    M -->|"Python"| N1["Ruff (Rust engine)"]
+    M -->|"Rust"| N2["rustfmt"]
+    M -->|"Go"| N3["gofmt"]
+    M -->|"JS / TS / JSON"| N4["biome / prettier"]
+    M -->|"Bash"| N5["shfmt"]
+    M -->|"C / C++"| N6["clang-format"]
+    M -->|"HTML / CSS"| N7["prettier / biome"]
+    M -->|"Fallback"| O["Normalized Clean Code"]
+
+    N1 --> P["wl-copy / xclip Clipboard"]
+    N2 --> P
+    N3 --> P
+    N4 --> P
+    N5 --> P
+    N6 --> P
+    N7 --> P
     O --> P
     P --> Q["🔔 Desktop Notification"]
 ```
+
+### Supported Formatters
+
+| Language | Primary Formatter | Fallback Formatter | Offline / Auto-fallback |
+|---|---|---|:---:|
+| **Python** | `ruff` (bundled in venv) | — | ✅ Guaranteed |
+| **Rust** | `rustfmt` | — | ✅ Graceful passthrough |
+| **Go** | `gofmt` | — | ✅ Graceful passthrough |
+| **JavaScript / TypeScript / JSON** | `biome` | `prettier` | ✅ Graceful passthrough |
+| **Bash / Shell** | `shfmt` | — | ✅ Graceful passthrough |
+| **C / C++** | `clang-format` | — | ✅ Graceful passthrough |
+| **HTML / CSS** | `prettier` | `biome` | ✅ Graceful passthrough |
 
 ---
 
