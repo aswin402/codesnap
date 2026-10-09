@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codesnap-cli"
-version = "2.4.6"
+version = "2.4.7"
 description = "Instant offline code extractor for Linux (Wayland & GNOME) with smart OCR and auto-formatting"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -41,6 +41,9 @@ Changelog = "https://github.com/aswin402/codesnap/blob/main/CHANGELOG.md"
 dev = [
     "pytest>=8.0.0",
     "ruff>=0.4.0",
+]
+rapidocr = [
+    "rapidocr-onnxruntime>=1.3.0",
 ]
 
 [project.scripts]

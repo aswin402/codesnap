@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.7] - 2026-10-10
+
+### Added
+- **Dual-Engine OCR Pipeline (RapidOCR + Tesseract)**: Integrated ONNX-Runtime powered RapidOCR (PP-OCRv4) support as a modern, high-accuracy alternative to Tesseract for code extraction.
+- **Indentation Reconstruction**: Added geometric bounding box clustering and character-width analysis in `_reconstruct_code_from_rapidocr` to faithfully preserve indentation in code snippets.
+- **CLI Engine Switcher (`--engine`)**: Added `--engine {auto,rapidocr,tesseract}` CLI option allowing users to choose their engine or default to `auto` (auto-detects RapidOCR if installed, falling back to Tesseract).
+- **Diagnostics Output**: Updated `codesnap --version` to list installed and available OCR engines.
+- **Optional Dependency `codesnap-cli[rapidocr]`**: Configured `rapidocr` optional dependency in `pyproject.toml` so base installations remain featherweight while enabling one-command ONNX model installation.
+
 ## [2.4.6] - 2026-10-10
 
 ### Added

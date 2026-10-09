@@ -61,6 +61,7 @@ Standard OCR tools stumble on code: dark themes fail contrast checks, indentatio
 | **Wayland Support** | ❌ Fails on Mutter / GNOME 40+ | ✅ Native XDG Desktop Portal + `slurp` fallback |
 | **Dark Theme IDEs** | ❌ Poor contrast, missing symbols | ✅ Automatic polarity detection & contrast inversion |
 | **OCR Code Cleaning** | ❌ Leaves stray `\|`, broken `def` | ✅ AST-safe token correction (preserves `100`, `utf8`) |
+| **OCR Architecture** | ❌ Rigid single legacy engine | ✅ Dual-Engine: RapidOCR (ONNX) + Tesseract fallback |
 | **Indentation & Formatting**| ❌ Random tabs, mangled blocks | ✅ Multi-language auto-formatting (Ruff, rustfmt, gofmt, biome, prettier) |
 | **Resource Footprint** | ⚠️ Heavy wheels (`numpy`), 100MB+ | ✅ Zero NumPy bloat — C-accelerated Pillow, <400ms runtime |
 | **Language Intelligence** | ❌ Plain unformatted text | ✅ 11+ languages auto-detected & highlighted |
@@ -145,10 +146,13 @@ codesnap /path/to/screenshot.png -l rust
 # High-quality preprocessing for low-res or blurry screenshots
 codesnap --high-quality
 
+# Select OCR engine (auto, rapidocr, or tesseract)
+codesnap --engine rapidocr
+
 # Review and edit OCR output in $EDITOR before copying to clipboard
 codesnap --interactive
 
-# Inspect diagnostics and system backend health
+# Inspect diagnostics, installed OCR engines, and system backend health
 codesnap --version
 ```
 

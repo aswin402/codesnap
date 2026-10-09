@@ -23,7 +23,7 @@ success() { echo -e "${BLUE}🎉${NC} $*"; }
 
 echo ""
 echo "╔══════════════════════════════════════╗"
-echo "║       codesnap installer v2.4.6      ║"
+echo "║       codesnap installer v2.4.7      ║"
 echo "║   Fast OCR Code Extractor (Wayland)  ║"
 echo "╚══════════════════════════════════════╝"
 echo ""
@@ -128,7 +128,7 @@ if [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
 fi
 
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║ ✅ codesnap v2.4.6 installed successfully!               ║"
+echo "║ ✅ codesnap v2.4.7 installed successfully!               ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 echo ""
 echo "📸 How to use:"

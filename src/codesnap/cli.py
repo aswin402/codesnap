@@ -15,7 +15,7 @@ from codesnap.clipboard import copy_to_clipboard, send_notification
 from codesnap.exceptions import CaptureCancelledError, CodesnapError
 from codesnap.formatters import format_code
 from codesnap.languages import detect_language
-from codesnap.ocr import check_ocr_dependencies, extract_text_from_image
+from codesnap.ocr import check_ocr_dependencies, extract_text_from_image, get_available_engines
 
 
 def show_version() -> None:
@@ -28,6 +28,11 @@ def show_version() -> None:
     for tool in REQUIRED_SYSTEM_TOOLS:
         status = "✓" if shutil.which(tool) else "✗"
         print(f"  {status} {tool}")
+    print("\nOCR engines:")
+    available_engines = get_available_engines()
+    for eng in ["tesseract", "rapidocr"]:
+        status = "✓" if eng in available_engines else "✗ (optional)"
+        print(f"  {status} {eng}")
     session_type = os.environ.get("XDG_SESSION_TYPE", "unknown")
     print(f"\nSession type: {session_type}")
 
@@ -64,6 +69,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "-l", "--lang", help="Override detected programming language (e.g. python, rust, sql)"
     )
+    parser.add_argument(
+        "--engine",
+        choices=["auto", "rapidocr", "tesseract"],
+        default="auto",
+        help="OCR engine: auto (prefers RapidOCR if available), rapidocr, or tesseract",
+    )
     parser.add_argument("--no-clipboard", action="store_true", help="Skip copying to clipboard")
     parser.add_argument(
         "image", nargs="?", help="Optional image file to extract code from directly"
@@ -80,7 +91,7 @@ def main(argv: list[str] | None = None) -> int:
             print(f"[codesnap] ERROR: File not found: {args.image}", file=sys.stderr)
             return 1
         try:
-            check_ocr_dependencies()
+            check_ocr_dependencies(engine=args.engine)
         except CodesnapError as e:
             send_notification("codesnap error", str(e), icon="dialog-error")
             print(f"[codesnap] ERROR: {e}", file=sys.stderr)
@@ -88,6 +99,7 @@ def main(argv: list[str] | None = None) -> int:
     else:
         try:
             check_system_dependencies()
+            check_ocr_dependencies(engine=args.engine)
         except CodesnapError as e:
             send_notification("codesnap error", str(e), icon="dialog-error")
             print(f"[codesnap] ERROR: {e}", file=sys.stderr)
@@ -111,7 +123,9 @@ def main(argv: list[str] | None = None) -> int:
                 return 1
 
         try:
-            raw_text = extract_text_from_image(img_path, high_quality=args.high_quality)
+            raw_text = extract_text_from_image(
+                img_path, high_quality=args.high_quality, engine=args.engine
+            )
         except CodesnapError as e:
             send_notification("codesnap error", str(e), icon="dialog-error")
             print(f"[codesnap] ERROR: {e}", file=sys.stderr)
