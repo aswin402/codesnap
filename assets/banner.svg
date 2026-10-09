@@ -22,18 +22,14 @@
       <stop offset="100%" stop-color="#cbd5e1"/>
     </linearGradient>
 
-    <radialGradient id="ambientGlow" cx="20%" cy="50%" r="50%">
-      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.12"/>
+    <radialGradient id="ambientGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.18"/>
       <stop offset="100%" stop-color="#38bdf8" stop-opacity="0"/>
     </radialGradient>
+  </defs>
 
-    <!-- Clip path to hide text until it slides out from behind the logo -->
-    <clipPath id="textRevealClip">
-      <rect x="195" y="0" width="645" height="200"/>
-    </clipPath>
-
-    <style>
-      /* Base styles & animations */
+  <style>
+    <![CDATA[
       @keyframes logoIntro {
         0% {
           transform: scale(0.7) translate(10px, 10px);
@@ -89,13 +85,16 @@
 
       @keyframes slashPulse {
         0%, 15% {
-          filter: drop-shadow(0 0 0px #38bdf8);
+          stroke-opacity: 0.8;
+          stroke-width: 4.5;
         }
         30%, 50% {
-          filter: drop-shadow(0 0 6px #38bdf8);
+          stroke-opacity: 1;
+          stroke-width: 5.5;
         }
         70%, 100% {
-          filter: drop-shadow(0 0 0px #38bdf8);
+          stroke-opacity: 0.8;
+          stroke-width: 4.5;
         }
       }
 
@@ -130,8 +129,8 @@
       }
 
       @keyframes pulseGlow {
-        0%, 100% { opacity: 0.3; }
-        50% { opacity: 0.8; }
+        0%, 100% { opacity: 0.25; transform: scale(0.9); }
+        50% { opacity: 0.7; transform: scale(1.1); }
       }
 
       .logo-container {
@@ -163,15 +162,16 @@
 
       .glow-bg {
         animation: pulseGlow 4s ease-in-out infinite;
+        transform-origin: 124px 100px;
       }
-    </style>
-  </defs>
+    ]]>
+  </style>
 
   <!-- Banner Background -->
   <rect width="840" height="200" rx="16" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="1.5"/>
 
   <!-- Ambient Light Behind Logo -->
-  <circle class="glow-bg" cx="124" cy="100" r="90" fill="url(#ambientGlow)"/>
+  <circle class="glow-bg" cx="124" cy="100" r="85" fill="url(#ambientGlow)"/>
 
   <!-- Animated Logo Mark -->
   <g class="logo-container">
@@ -194,15 +194,15 @@
     <g class="code-glyph" stroke="#f8fafc" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
       <!-- Left Bracket < -->
       <path d="M 112 86 L 100 100 L 112 114" />
-      <!-- Slash / with glow -->
+      <!-- Slash / with pulse -->
       <path class="slash-glow" d="M 128 82 L 120 118" stroke="url(#slashGrad)" />
       <!-- Right Bracket > -->
       <path d="M 136 86 L 148 100 L 136 114" />
     </g>
   </g>
 
-  <!-- Typography with Slide-out Animation (Clipped to right of logo) -->
-  <g clip-path="url(#textRevealClip)">
+  <!-- Typography with Slide-out Animation to the Right -->
+  <g>
     <!-- Title: codesnap -->
     <text class="title-text" x="220" y="105"
           font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif"

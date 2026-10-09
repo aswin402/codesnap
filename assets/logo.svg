@@ -13,8 +13,10 @@
       <stop offset="50%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#020617"/>
     </linearGradient>
+  </defs>
 
-    <style>
+  <style>
+    <![CDATA[
       @keyframes snapPulse {
         0%, 100% {
           transform: scale(1);
@@ -26,10 +28,12 @@
 
       @keyframes slashGlow {
         0%, 100% {
-          filter: drop-shadow(0 0 1px #38bdf8);
+          stroke-opacity: 0.8;
+          stroke-width: 4.5;
         }
         50% {
-          filter: drop-shadow(0 0 5px #38bdf8);
+          stroke-opacity: 1;
+          stroke-width: 5.5;
         }
       }
 
@@ -41,8 +45,8 @@
       .slash {
         animation: slashGlow 3.5s ease-in-out infinite;
       }
-    </style>
-  </defs>
+    ]]>
+  </style>
 
   <!-- Container Squircle -->
   <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2"/>
