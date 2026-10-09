@@ -4,17 +4,51 @@
       <stop offset="0%" stop-color="#818cf8"/>
       <stop offset="100%" stop-color="#38bdf8"/>
     </linearGradient>
+    <linearGradient id="slashGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#818cf8"/>
+    </linearGradient>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="0%" stop-color="#0b0f19"/>
+      <stop offset="50%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#020617"/>
     </linearGradient>
+
+    <style>
+      @keyframes snapPulse {
+        0%, 100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.04);
+        }
+      }
+
+      @keyframes slashGlow {
+        0%, 100% {
+          filter: drop-shadow(0 0 1px #38bdf8);
+        }
+        50% {
+          filter: drop-shadow(0 0 5px #38bdf8);
+        }
+      }
+
+      .corners {
+        animation: snapPulse 3.5s ease-in-out infinite;
+        transform-origin: 64px 64px;
+      }
+
+      .slash {
+        animation: slashGlow 3.5s ease-in-out infinite;
+      }
+    </style>
   </defs>
 
   <!-- Container Squircle -->
   <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#bgGrad)" stroke="#1e293b" stroke-width="2"/>
 
   <!-- Screen Capture Viewfinder Corners -->
-  <g stroke="url(#bracketGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
+  <g class="corners" stroke="url(#bracketGrad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" fill="none">
     <!-- Top-Left -->
     <path d="M 26 42 L 26 30 A 4 4 0 0 1 30 26 L 42 26" />
     <!-- Top-Right -->
@@ -30,7 +64,7 @@
     <!-- Left Bracket < -->
     <path d="M 52 50 L 40 64 L 52 78" />
     <!-- Slash / -->
-    <path d="M 68 46 L 60 82" stroke="url(#bracketGrad)" />
+    <path class="slash" d="M 68 46 L 60 82" stroke="url(#slashGrad)" />
     <!-- Right Bracket > -->
     <path d="M 76 50 L 88 64 L 76 78" />
   </g>
